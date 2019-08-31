@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.ciifm.personal.admin.dao.PermissionDAO">
+    <resultMap id="BaseResultMap" type="com.github.ciifm.personal.admin.dao.dataobject.PermissionDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="resource_type" property="resourceType" jdbcType="VARCHAR"/>
+        <result column="href" property="href" jdbcType="VARCHAR"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+        <result column="level" property="level" jdbcType="BIGINT"/>
+        <result column="parent_ids" property="parentIds" jdbcType="VARCHAR"/>
+        <result column="sort" property="sort" />
+        <result column="permission" property="permission" jdbcType="VARCHAR"/>
+        <result column="bg_color" property="bgColor" jdbcType="VARCHAR"/>
+        <result column="icon" property="icon" jdbcType="VARCHAR"/>
+        <result column="is_show" property="isShow" jdbcType="VARCHAR"/>
+        <result column="creator" property="creator" jdbcType="VARCHAR"/>
+        <result column="modifier" property="modifier" jdbcType="VARCHAR"/>
+        <result column="gmt_created" property="gmtCreated" jdbcType="TIMESTAMP"/>
+        <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="CHAR"/>
+    </resultMap>
+
+    <sql id="BaseTable">
+        permission
+    </sql>
+
+    <sql id="BaseColumns">
+        id,name,resource_type,href,parent_id,level,parent_ids,sort,permission,bg_color,icon,is_show,creator,modifier,gmt_created,gmt_modified,is_deleted
+    </sql>
+
+    <select id="search" resultMap="BaseResultMap">
+        select <include refid="BaseColumns" />
+        from <include refid="BaseTable" />
+    </select>
+
+    <select id="findByName" parameterType="java.lang.String" resultMap="BaseResultMap" >
+        select <include refid="BaseColumns" />
+        from <include refid="BaseTable" />
+        where name = #{name}
+    </select>
+
+    <select id="findByRoleId" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+        select <include refid="BaseColumns" />
+        from <include refid="BaseTable" />
+        where id in (SELECT pid FROM role_permission WHERE rid = #{id})
+    </select>
+
+    <select id="findPermissionsURL" parameterType="java.lang.Long" resultType="java.lang.String" >
+        select
+        permission
+        from <include refid="BaseTable" />
+        where id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findAllMenu" resultType="com.github.ciifm.personal.admin.dao.dataobject.PermissionDO" >
+        select
+        <include refid="BaseColumns" />
+        from <include refid="BaseTable" />
+        where is_show = 1
+    </select>
+
+    <!-- 批量删除权限 -->
+    <delete id="deleteBacthPermission" parameterType="java.lang.Long">
+        DELETE FROM role_permission WHERE pid in
+        <foreach collection="array" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 批量删除权限 -->
+    <delete id="deleteBacthByRids" parameterType="java.lang.Long">
+        DELETE FROM role_permission WHERE rid in
+        <foreach collection="array" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 批量插入角色对应权限数据 -->
+    <insert id="insertBatchRolePermission" parameterType="com.github.ciifm.personal.admin.dao.dataobject.RolePermissionDO">
+        INSERT INTO role_permission(
+        rid,
+        pid
+        )VALUES
+        <foreach collection ="list" item="rolePermission" separator =",">
+            (#{rolePermission.rid}, #{rolePermission.pid})
+        </foreach >
+    </insert>
+</mapper>

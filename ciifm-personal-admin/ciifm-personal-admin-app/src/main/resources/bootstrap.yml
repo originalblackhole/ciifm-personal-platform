@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      name: application #上传的配置文件文件名前缀
+      profile: dev #上传的配置文件文件名后缀
+      label: master #指定仓库分支
+      uri: http://127.0.0.1:8888 #配置中心工程地址

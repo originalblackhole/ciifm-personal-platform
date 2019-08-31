@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<th:block th:fragment="menuTree(permissionList)">
+    <th:block th:each="permission : ${permissionList}">
+        <li style="margin-top: 5px;margin-left: 1.5em">
+            <input type="checkbox" th:title="${permission.name}" th:value="${permission.id}" th:data-parentIds = "${permission.parentIds}" th:checked="${permission.hasPermission}" lay-filter="roleMenu" />
+            <ul >
+                <th:block th:unless="${#lists.isEmpty(permission.children)}" th:include="this::menuTree(${permission.children})"/>
+            </ul>
+        </li>
+    </th:block>
+</th:block>
+</body>
+</html>

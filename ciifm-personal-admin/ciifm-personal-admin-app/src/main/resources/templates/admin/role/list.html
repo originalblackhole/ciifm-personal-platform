@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>用户中心--layui后台管理模板 2.0</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" th:href="@{../../static/layui/css/layui.css}" media="all" />
+	<link rel="stylesheet" th:href="@{../../static/css/public.css}" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+	<blockquote class="layui-elem-quote quoteBox">
+		<form class="layui-form">
+			<div class="layui-inline">
+				<div class="layui-input-inline" >
+					<input type="text" class="layui-input searchVal" placeholder="请输入角色名" />
+				</div>
+				<a class="layui-btn search_btn" data-type="reload" lay-filter="searchForm">搜索</a>
+			</div>
+			<div class="layui-inline">
+				<a class="layui-btn layui-btn-normal" data-type="addRole" lay-event="addRole">添加角色</a>
+			</div>
+			<div class="layui-inline">
+				<a class="layui-btn layui-btn-danger layui-btn-normal" lay-event="deleteBatch" data-type="deleteBatch">批量删除</a>
+			</div>
+			<div class="layui-inline">
+				<a class="layui-btn  layui-btn-normal" data-type="addBatch">批量添加测试用户</a>
+			</div>
+		</form>
+	</blockquote>
+<div class="layui-form users_list">
+	<table class="layui-table" id="roleTable" lay-filter="roleTable"></table>
+
+	<script type="text/html" id="operate">
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" data-type="del">删除</a>
+	</script>
+</div>
+</form>
+<script type="text/javascript" th:src="@{../../static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{../../static/js/tools.js}"></script>
+<script th:inline="javascript">
+    layui.use(['layer','form','table'], function() {
+        var layer = layui.layer,
+            $ = layui.jquery,
+            table = layui.table,
+            t;                  //表格数据变量
+        t = {
+            elem: '#roleTable',
+            url:'/admin/role/list',
+            method:'post',
+            page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
+                //curr: 5 ,//设定初始在第 5 页
+                groups: 5, //只显示 1 个连续页码
+                first: "首页", //显示首页
+                last: "尾页", //显示尾页
+                limits:[10, 20, 30]
+            },
+            request:{
+                pageName: 'pageIndex',
+                limitName: 'pageSize',
+                hash: 'condition'
+            },
+            width: $(parent.window).width()-223,
+            cols: [[
+                {type:'checkbox'},
+                {field:'id', title: 'ID',width:'3%'},
+                {field:'roleName',  title: '角色名称',    width:'15%'},
+                {field:'creator',    title: '创建人', align: 'center'},
+                {field:'modifier',    title: '修改人', align: 'center'},
+                {field:'gmtCreated',  title: '创建时间',width:'15%',align: 'center',templet:'<div>{{ layui.laytpl.toDateString(d.gmtCreated) }}</div>',unresize: true}, //单元格内容水平居中
+                {field:'gmtModified',  title: '创建时间',width:'15%',align: 'center',templet:'<div>{{ layui.laytpl.toDateString(d.gmtModified) }}</div>',unresize: true}, //单元格内容水平居中
+                {fixed: 'right', title:'操作',  width: '15%', align: 'center',toolbar: '#operate'}
+            ]]
+        };
+        table.render(t);
+
+
+        //监听工具条
+        table.on('tool(roleTable)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                var editIndex = layer.open({
+                    title : "编辑角色",
+                    type : 2,
+                    content : "/admin/role/edit?id="+data.id,
+                    success : function(layero, index){
+                        setTimeout(function(){
+                            layer.tips('点击此处返回编辑列表', '.layui-layer-setwin .layui-layer-close', {
+                                tips: 3
+                            });
+                        },500);
+                    }
+                });
+                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+                $(window).resize(function(){
+                    layer.full(editIndex);
+                });
+                layer.full(editIndex);
+			}
+            if(obj.event === 'del'){
+                var params = {};
+                var ids = [];
+                ids[0] = data.id;
+                params.ids = ids;
+                layer.confirm("你确定要删除该角色么？",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
+                        $.ajax({
+                            type:"POST",
+                            url:"/admin/role/deleteBatch",
+                            dataType:"json",
+                            contentType:"application/json",
+                            data: JSON.stringify(params),
+                            success:function(res){
+                                layer.close(deleteindex);
+                                if(res.code == 0){
+                                    layer.msg("删除成功",{time: 1000},function(){
+                                        table.reload('roleTable', t);
+                                    });
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                    }
+                )
+			}
+		});
+
+        //功能按钮
+        var active = {
+            addRole : function(){
+                var addIndex = layer.open({
+                    title : "添加角色",
+                    type : 2,
+                    content : "/admin/role/add",
+                    success : function(layero, index){
+                        setTimeout(function(){
+                            layer.tips('点击此处返回角色列表', '.layui-layer-setwin .layui-layer-close', {
+                                tips: 3
+                            });
+                        },500);
+                    }
+                });
+                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+                $(window).resize(function(){
+                    layer.full(addIndex);
+                });
+                layer.full(addIndex);
+            },
+            deleteBatch : function(){//批量删除
+                var checkStatus = table.checkStatus('roleTable'),
+                    data = checkStatus.data;
+                if(data.length <= 0){
+                    layer.msg("请选择需要删除的用户",{time:1000});
+                    return;
+                }
+                var params = {};
+                var ids = [];
+                for(var i=0;i<data.length;i++){
+                    var d = data[i];
+                    if(d.id === 1){
+                        layer.msg("不能删除超级管理员角色");
+                        return false;
+                    }
+                    ids[i] = d.id;
+                }
+                params.ids = ids;
+                layer.confirm("你确定要删除这些角色么？",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
+                        $.ajax({
+                            type:"POST",
+                            url:"/admin/role/deleteBatch",
+                            dataType:"json",
+                            contentType:"application/json",
+                            data:JSON.stringify(params),
+                            success:function(res){
+                                layer.close(deleteindex);
+                                if(res.code == 0){
+                                    layer.msg("删除成功",{time: 1000},function(){
+                                        table.reload('roleTable', t);
+                                    });
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                    }
+                )
+            },
+
+		}
+
+        $('.layui-inline .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //搜索
+        $(".search_btn").on("click",function(){
+            //console.log("searchVal = " + $(".searchVal").val())
+			var condition = $(".searchVal").val();
+            console.log("condition = " + condition)
+            table.reload("roleTable",{
+                url:'/admin/role/list',
+                request:{
+                    pageName: 'pageIndex',
+                    limitName: 'pageSize',
+                    hash: 'condition'
+                },
+                where: {
+                    condition: condition //搜索的关键字
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>

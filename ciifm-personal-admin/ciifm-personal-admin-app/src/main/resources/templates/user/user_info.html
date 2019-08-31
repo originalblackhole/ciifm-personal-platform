@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>个人资料--layui后台管理模板 2.0</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" th:href="@{../../static/layui/css/layui.css}" media="all" />
+	<link rel="stylesheet" th:href="@{../../static/css/public.css}" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form layui-row">
+	<div class="layui-col-md3 layui-col-xs12 user_right">
+		<div class="layui-upload-list">
+			<img class="layui-upload-img layui-circle userFaceBtn userAvatar" name="file" id="userFace" th:src="${currentUser.icon}?:''">
+		</div>
+		<button type="button" class="layui-btn layui-btn-primary userFaceBtn"><i class="layui-icon">&#xe67c;</i> 修改头像</button>
+	</div>
+	<div class="layui-col-md6 layui-col-xs12">
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户名</label>
+			<div class="layui-input-block">
+				<input type="text" th:value="${currentUser.userName}?:''" disabled class="layui-input layui-disabled">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户组</label>
+			<div class="layui-input-block">
+				<input type="text" th:value="${currentUser.roles}?:''" disabled class="layui-input layui-disabled">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">昵称</label>
+			<div class="layui-input-block">
+				<input type="tel" th:value="${currentUser.nickName}?:''" name="nickName" placeholder="请输入昵称" lay-verify="nickName" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">手机号码</label>
+			<div class="layui-input-block">
+				<input type="tel" th:value="${currentUser.tel}?:''" name="tel" placeholder="请输入手机号码" lay-verify="phone" class="layui-input userPhone">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">邮箱</label>
+			<div class="layui-input-block">
+				<input type="text" th:value="${currentUser.email}?:''" name="email" placeholder="请输入邮箱" lay-verify="email" class="layui-input userEmail">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">自我介绍</label>
+			<div class="layui-input-block">
+				<textarea  th:text="${currentUser.remark}?:''" name="remark" placeholder="请输入内容" class="layui-textarea myself"></textarea>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit="" lay-filter="changeUser">立即提交</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			</div>
+		</div>
+	</div>
+</form>
+<script type="text/javascript" th:src="@{../../static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{../../static/js/page/user_info.js}"></script>
+</body>
+</html>

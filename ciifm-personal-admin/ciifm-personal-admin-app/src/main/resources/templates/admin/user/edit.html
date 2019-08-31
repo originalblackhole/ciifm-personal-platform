@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>文章列表--layui后台管理模板 2.0</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" th:href="@{../../../static/layui/css/layui.css}" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form" style="width:80%;">
+	<input class="layui-hide" name="id" th:value="${user.id}" />
+	<div class="layui-form-item">
+		<label class="layui-form-label">登录名</label>
+		<div class="layui-input-block">
+			<input type="text" class="layui-input layui-disabled" name="userName" lay-verify="required" disabled  th:value="${user.userName}" >
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<div class="layui-inline">
+			<label class="layui-form-label">昵称</label>
+			<div class="layui-input-block">
+				<input type="text" class="layui-input" name="nickName" placeholder="请输入昵称" th:value="${user.nickName}">
+			</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">邮箱</label>
+			<div class="layui-input-block">
+				<input type="text" class="layui-input" name="email" lay-verify="email" placeholder="请输入邮箱" th:value="${user.email}">
+			</div>
+		</div>
+		<div class="layui-inline">
+			<label class="layui-form-label">手机</label>
+			<div class="layui-input-block">
+				<input type="text" class="layui-input" name="tel" lay-verify="phone" placeholder="请输入手机号" th:value="${user.tel}">
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">用户角色</label>
+		<div class="layui-input-block role-box">
+			<div class="jq-role-inline">
+				<fieldset class="layui-elem-field">
+					<legend>选择角色</legend>
+					<div class="layui-field-box" >
+						<span th:each="role:${roles}">
+							<input type="checkbox" name="roles" th:value="${role.id}" th:title="${role.roleName}" th:if="${role.hasRole == true}" checked lay-filter="role" />
+							<input type="checkbox" name="roles" th:value="${role.id}" th:title="${role.roleName}" th:unless="${role.hasRole == true}" lay-filter="role" />
+						</span>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+
+	<!--<div class="layui-form-item">
+		<label class="layui-form-label">是否启用</label>
+		<div class="layui-input-block">
+			<input type="checkbox" name="delFlag" lay-skin="switch" value="true" th:value="${user.state}"  lay-text="启用|停用" checked="" >
+	</div>-->
+	</div>
+	<div class="layui-form-item ">
+		<div class="layui-input-block">
+			<button class="layui-btn" lay-submit="" lay-filter="editUser">确认修改</button>
+			<button type="reset" class="layui-btn">重置</button>
+		</div>
+	</div>
+</form>
+<script type="text/javascript" th:src="@{../../../static/layui/layui.js}"></script>
+<script th:inline="javascript">
+    layui.use(['form','jquery','layer'],function(){
+        var form = layui.form,
+            $    = layui.jquery,
+            layer = layui.layer;
+
+        form.on("submit(editUser)",function(data){
+            if(data.field.id == null){
+                layer.msg("用户ID不存在");
+                return false;
+            }
+            //给角色赋值
+            delete data.field["roles"];
+            var selectRole = [];
+            $('input[name="roles"]:checked').each(function(){
+                console.log("roleName = " + $(this).attr("title"))
+                selectRole.push({"id":$(this).val(),"roleName":$(this).attr("title")});
+            });
+            data.field.roleList = selectRole;
+
+            var loadIndex = layer.load(2, {
+                shade: [0.3, '#333']
+            });
+            $.ajax({
+                type:"POST",
+                url:"/admin/user/edit",
+                dataType:"json",
+                contentType:"application/json",
+                data:JSON.stringify(data.field),
+                success:function(res){
+                    layer.close(loadIndex);
+                    if(res.code == 0){
+                        parent.layer.msg("修改成功！",{time:1500},function(){
+                            parent.location.reload();
+                        });
+                    }else{
+                        layer.msg(res.message);
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

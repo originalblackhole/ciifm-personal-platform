@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.ciifm.personal.admin.dao.RoleDAO">
+    <resultMap id="BaseResultMap" type="com.github.ciifm.personal.admin.dao.dataobject.RoleDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="role_name" property="roleName" jdbcType="VARCHAR"/>
+        <result column="creator" property="creator" jdbcType="VARCHAR"/>
+        <result column="modifier" property="modifier" jdbcType="VARCHAR"/>
+        <result column="gmt_created" property="gmtCreated" jdbcType="TIMESTAMP"/>
+        <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="CHAR"/>
+    </resultMap>
+
+    <sql id="BaseTable">
+        role
+    </sql>
+
+    <sql id="BaseColumns">
+        id,role_name,creator,modifier,gmt_created,gmt_modified,is_deleted
+    </sql>
+
+    <select id="findByName" parameterType="java.lang.String" resultMap="BaseResultMap" >
+        select <include refid="BaseColumns" />
+        from <include refid="BaseTable" />
+        where role_name = #{name}
+    </select>
+
+    <select id="search" resultMap="BaseResultMap">
+        select <include refid="BaseColumns" />
+        from <include refid="BaseTable" />
+    </select>
+
+    <delete id="deleteRolePerssionByRid" parameterType="java.lang.Long">
+        DELETE FROM role_permission WHERE rid = #{id}
+    </delete>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        DELETE FROM user_role WHERE uid = #{id}
+    </delete>
+
+    <!-- 批量插入角色对应权限数据 -->
+    <insert id="insertBatchUserRole" parameterType="com.github.ciifm.personal.admin.dao.dataobject.UserRoleDO">
+        INSERT INTO user_role(
+        uid,
+        rid
+        )VALUES
+        <foreach collection ="list" item="userRole" separator =",">
+            (#{userRole.uid}, #{userRole.rid})
+        </foreach >
+    </insert>
+</mapper>

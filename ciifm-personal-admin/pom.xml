@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ciifm-personal-platform</artifactId>
+        <groupId>com.github.ciifm</groupId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>ciifm-personal-admin</artifactId>
+    <version>${project.parent.version}</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>ciifm-personal-admin-app</module>
+        <module>ciifm-personal-admin-dao</module>
+        <module>ciifm-personal-admin-component</module>
+        <module>ciifm-personal-admin-provider</module>
+        <module>ciifm-personal-admin-share</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.ciifm</groupId>
+            <artifactId>handy-framework</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+</project>
