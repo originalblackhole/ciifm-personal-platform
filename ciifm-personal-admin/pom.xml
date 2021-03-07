@@ -23,9 +23,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.ciifm</groupId>
-            <artifactId>handy-framework</artifactId>
-            <version>1.0.0</version>
+            <groupId>com.github.originalblackhole</groupId>
+            <artifactId>handy-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.originalblackhole</groupId>
+            <artifactId>handy-service</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.originalblackhole</groupId>
+            <artifactId>handy-util</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

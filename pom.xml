@@ -52,9 +52,8 @@
 
   <repositories>
     <repository>
-      <id>ciifm-repo</id>
-      <url>https://raw.githubusercontent.com/ciifm/maven-repo-public/master</url>
-      <!--<url>file:/code/github/deploy/repository/public</url>-->
+      <id>mvn-repo</id>
+      <url>https://gitee.com/original-blackhole/mvn-repo/raw/master</url>
     </repository>
   </repositories>
 
